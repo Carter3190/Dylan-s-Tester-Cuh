@@ -1,0 +1,216 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Set Availability - Auxilium</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+header {
+  background-color: #f8b4b4;
+  padding: 10px 40px;
+  color: white;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.page-title {
+  margin: 0 auto;
+  font-size: 1.8rem;
+  font-weight: 600;
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.header-btn {
+  background-color: #d6c6f7;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  transition: background-color 0.3s ease;
+  z-index: 1;
+}
+
+.header-btn:hover {
+  background-color: #b6a3f0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #444;
+}
+
+.day-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.day-label {
+  width: 100px;
+  font-weight: 500;
+}
+
+.time-select {
+  display: flex;
+  gap: 10px;
+}
+
+/* 🎨 Custom styled dropdowns */
+select {
+  padding: 10px 14px;
+  font-size: 1rem;
+  border: 2px solid #d6c6f7;
+  border-radius: 12px;
+  background-color: #fdfaff;
+  color: #444;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(214, 198, 247, 0.3);
+}
+
+select:hover {
+  border-color: #b6a3f0;
+  background-color: #f8f3ff;
+  box-shadow: 0 3px 8px rgba(182, 163, 240, 0.4);
+}
+
+select:focus {
+  outline: none;
+  border-color: #f8b4b4;
+  background-color: #fff0f5;
+  box-shadow: 0 0 0 3px rgba(248, 180, 180, 0.4);
+}
+
+.buttons {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.save-btn {
+  padding: 12px 30px;
+  font-size: 1rem;
+  background-color: #d6c6f7;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(214, 198, 247, 0.4);
+}
+
+.save-btn:hover {
+  background-color: #b6a3f0;
+  box-shadow: 0 6px 14px rgba(182, 163, 240, 0.5);
+}
+  </style>
+</head>
+<body>
+  
+<header>
+  <div class="header-container">
+    <a href="index.html" class="header-btn">Home</a>
+  </div>
+</header>
+
+<header>
+  <h1 style="text-align:center;">Set Your Availability</h1>
+</header>
+
+<div class="container">
+  <h2>Choose your working days and hours</h2>
+  <form id="availabilityForm">
+    <div id="daysContainer"></div>
+
+    <div class="buttons">
+      <button type="submit" class="save-btn">Save Availability</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const container = document.getElementById('daysContainer');
+
+  days.forEach(day => {
+    const row = document.createElement('div');
+    row.classList.add('day-row');
+
+    row.innerHTML = `
+      <div class="day-label">${day}</div>
+      <div class="time-select">
+        <select name="${day}-from">
+          ${generateTimeOptions()}
+        </select>
+        <span>to</span>
+        <select name="${day}-to">
+          ${generateTimeOptions()}
+        </select>
+      </div>
+    `;
+
+    container.appendChild(row);
+  });
+
+  function generateTimeOptions() {
+    const times = [];
+    for (let h = 0; h < 24; h++) {
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hour = h % 12 === 0 ? 12 : h % 12;
+      times.push(`<option value="${hour}:00 ${ampm}">${hour}:00 ${ampm}</option>`);
+      times.push(`<option value="${hour}:30 ${ampm}">${hour}:30 ${ampm}</option>`);
+    }
+    return times.join('');
+  }
+
+  document.getElementById('availabilityForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const availability = {};
+    days.forEach(day => {
+      const from = document.querySelector(`select[name="${day}-from"]`).value;
+      const to = document.querySelector(`select[name="${day}-to"]`).value;
+      availability[day] = { from, to };
+    });
+
+    localStorage.setItem('sellerAvailability', JSON.stringify(availability));
+    alert("Availability saved!");
+    window.location.href = "post-login.html"; // Redirect back to profile
+  });
+</script>
+
+</body>
+</html>
